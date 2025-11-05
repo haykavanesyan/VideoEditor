@@ -1,0 +1,15 @@
+.videoPlayer {
+    background: #000;
+    border-radius: 16px;
+    overflow: hidden;
+    margin-bottom: 24px;
+    position: relative;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  }
+  
+  .video {
+    width: 100%;
+    height: auto;
+    max-height: 60vh;
+    display: block;
+  }

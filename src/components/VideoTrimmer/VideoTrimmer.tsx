@@ -1,0 +1,188 @@
+import React, { useState, useRef } from 'react';
+import { Scissors, Download, Plus } from 'lucide-react';
+import { observer } from 'mobx-react-lite';
+
+import { videoStore } from '../../stores';
+import UploadZone from '../UploadZone/UploadZone';
+import VideoPlayer from '../VideoPlayer/VideoPlayer';
+import Controls from '../Controls/Controls';
+import Timeline from '../Timeline/Timeline';
+import { ffmpegService } from '../../services/ffmpegService';
+
+import styles from './VideoTrimmer.module.scss';
+
+const VideoTrimmer: React.FC = observer(() => {
+  const store = videoStore;
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [showUploadZone, setShowUploadZone] = useState(true);
+
+  const handleFileUpload = (file: File) => {
+    const url = URL.createObjectURL(file);
+    store.setVideoFile(file);
+    store.setVideoUrl(url);
+    setShowUploadZone(false);
+  };
+
+  const handleLoadedMetadata = () => {
+    const video = videoRef.current;
+    if (video) {
+      store.setDuration(video.duration);
+      store.setTrimEnd(video.duration);
+    }
+  };
+
+  const handleTimeUpdate = () => {
+    const video = videoRef.current;
+    if (video) {
+      store.setCurrentTime(video.currentTime);
+      if (video.currentTime >= store.trimEnd) {
+        video.currentTime = store.trimStart;
+      }
+    }
+  };
+
+  const togglePlayPause = () => {
+    const video = videoRef.current;
+    if (video) {
+      if (store.isPlaying) {
+        video.pause();
+        store.setIsPlaying(false);
+      } else {
+        if (video.currentTime >= store.trimEnd || video.currentTime < store.trimStart) {
+          video.currentTime = store.trimStart;
+        }
+        video.play().catch(console.error);
+        store.setIsPlaying(true);
+      }
+    }
+  };
+
+  const changeSpeed = (speed: number) => {
+    const video = videoRef.current;
+    if (video) {
+      video.playbackRate = speed;
+      store.setPlaybackSpeed(speed);
+    }
+  };
+
+  const resetTrim = () => {
+    store.setTrimStart(0);
+    store.setTrimEnd(store.duration);
+    store.setPlaybackSpeed(1)
+    const video = videoRef.current;
+    if (video) {
+      video.currentTime = 0;
+      video.playbackRate = 1
+      video.pause()
+    }
+  };
+
+  const handleFileReset = () => {
+    store.setVideoFile(null);
+    store.setVideoUrl('');
+    setShowUploadZone(true);
+    resetTrim()
+  };
+
+  const exportVideo = async () => {
+    if (!store.videoFile) return;
+
+    store.setIsExporting(true);
+    try {
+      await ffmpegService.load();
+
+      const blob = await ffmpegService.trimAndExport(
+        store.videoFile,
+        store.trimStart,
+        store.trimEnd,
+        store.playbackSpeed
+      );
+
+      const url = URL.createObjectURL(blob);
+
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `trimmed_${store.videoFile.name}`;
+      link.click();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error('Export failed:', err);
+      alert('Failed to export video');
+    } finally {
+      store.setIsExporting(false);
+    }
+  };
+
+
+  return (
+    <div className={styles.container}>
+      <div className={styles.wrapper}>
+        <div className={styles.header}>
+          <div className={styles.headerContent}>
+            <Scissors size={32} />
+            <div>
+              <h1 className={styles.title}>Video Trimmer</h1>
+              <p className={styles.subtitle}>
+                Trim your videos with precision and ease
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className={styles.content}>
+          {showUploadZone ? (
+            <UploadZone onFileUpload={handleFileUpload} />
+          ) : (
+            <div className={styles.editor}>
+              <div
+                className={styles.uploadNewContainer}
+              >
+                <button
+                  onClick={handleFileReset}
+                  className={styles.uploadNewButton}
+                >
+                  <Plus size={16} />
+                  Upload new video
+                </button>
+              </div>
+
+              <VideoPlayer
+                videoRef={videoRef}
+                onLoadedMetadata={handleLoadedMetadata}
+                onTimeUpdate={handleTimeUpdate}
+              />
+
+              <Controls
+                onPlayPause={togglePlayPause}
+                onSpeedChange={changeSpeed}
+                onResetTrim={resetTrim}
+              />
+
+              <Timeline videoRef={videoRef} />
+
+              <button
+                onClick={exportVideo}
+                disabled={store.isExporting || !store.videoFile}
+                className={styles.exportButton}
+              >
+                {store.isExporting ? (
+                  <>
+                    <div className={styles.spinner} />
+                    Exporting...
+                  </>
+                ) : (
+                  <>
+                    <Download size={24} />
+                    Export Trimmed Video
+                  </>
+                )}
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+});
+
+export default VideoTrimmer;

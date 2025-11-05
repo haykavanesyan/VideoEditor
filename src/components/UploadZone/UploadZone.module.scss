@@ -1,0 +1,43 @@
+.uploadZone {
+    border: 3px dashed #667eea;
+    border-radius: 16px;
+    padding: 80px 40px;
+    text-align: center;
+    cursor: pointer;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  
+    &:hover {
+      transform: scale(1.02);
+      border-color: #764ba2;
+    }
+  }
+  
+  .uploadIcon {
+    margin: 0 auto 24px;
+    color: #667eea;
+  }
+  
+  .title {
+    font-size: 24px;
+    color: #2d3748;
+    margin: 0 0 12px 0;
+  }
+  
+  .subtitle {
+    color: #718096;
+    font-size: 16px;
+    margin: 0 0 24px 0;
+  }
+  
+  .fileTypes {
+    color: #a0aec0;
+    font-size: 14px;
+    margin: 0;
+  }
+  
+  .fileInput {
+    display: none;
+  }

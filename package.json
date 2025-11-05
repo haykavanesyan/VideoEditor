@@ -1,0 +1,30 @@
+{
+  "name": "video-trimmer",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@ffmpeg/core": "^0.12.10",
+    "@ffmpeg/ffmpeg": "^0.12.15",
+    "@ffmpeg/util": "^0.12.2",
+    "lucide-react": "^0.552.0",
+    "mobx": "^6.13.0",
+    "mobx-react-lite": "^4.0.5",
+    "path": "^0.12.7",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.0.28",
+    "@types/react-dom": "^18.0.11",
+    "@vitejs/plugin-react": "^5.1.0",
+    "sass": "^1.93.3",
+    "typescript": "^5.0.4",
+    "vite": "^5.0.0"
+  }
+}

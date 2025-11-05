@@ -1,0 +1,103 @@
+.timelineContainer {
+    margin-bottom: 32px;
+  }
+  
+  .timelineHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+  
+  .trimInfo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .clockIcon {
+    color: #667eea;
+  }
+  
+  .trimText {
+    font-size: 14px;
+    font-weight: 600;
+    color: #4a5568;
+  }
+  
+  .durationBadge {
+    padding: 4px 12px;
+    background: #667eea;
+    color: white;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  
+  .currentTime {
+    font-size: 14px;
+    color: #a0aec0;
+  }
+  
+  .timeline {
+    height: 80px;
+    background: #f7fafc;
+    border-radius: 12px;
+    position: relative;
+    cursor: pointer;
+    border: 2px solid #e2e8f0;
+  }
+  
+  .selectedRange {
+    position: absolute;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.3) 0%, rgba(118, 75, 162, 0.3) 100%);
+    border-radius: 8px;
+    border: 2px solid #667eea;
+  }
+  
+  .currentTimeIndicator {
+    position: absolute;
+    top: 0;
+    width: 3px;
+    height: 100%;
+    background: #e53e3e;
+    z-index: 2;
+    box-shadow: 0 0 10px rgba(229, 62, 62, 0.5);
+  }
+  
+  .marker {
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 24px;
+    height: 60px;
+    border-radius: 6px;
+    cursor: ew-resize;
+    z-index: 3;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  
+    &[data-type="start"] {
+      background: #667eea;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.5);
+    }
+  
+    &[data-type="end"] {
+      background: #764ba2;
+      box-shadow: 0 4px 12px rgba(118, 75, 162, 0.5);
+    }
+  
+    &:hover {
+      transform: translate(-50%, -50%) scale(1.1);
+    }
+  }
+  
+  .markerHandle {
+    width: 3px;
+    height: 30px;
+    background: white;
+    border-radius: 2px;
+  }
