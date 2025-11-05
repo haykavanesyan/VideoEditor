@@ -14,13 +14,12 @@ import styles from './VideoTrimmer.module.scss';
 const VideoTrimmer: React.FC = observer(() => {
   const store = videoStore;
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [showUploadZone, setShowUploadZone] = useState(true);
 
   const handleFileUpload = (file: File) => {
     const url = URL.createObjectURL(file);
     store.setVideoFile(file);
     store.setVideoUrl(url);
-    setShowUploadZone(false);
+    store.setShowUploadZone(false);
   };
 
   const handleLoadedMetadata = () => {
@@ -80,7 +79,7 @@ const VideoTrimmer: React.FC = observer(() => {
   const handleFileReset = () => {
     store.setVideoFile(null);
     store.setVideoUrl('');
-    setShowUploadZone(true);
+    store.setShowUploadZone(true);
     resetTrim()
   };
 
@@ -130,7 +129,7 @@ const VideoTrimmer: React.FC = observer(() => {
         </div>
 
         <div className={styles.content}>
-          {showUploadZone ? (
+          {store.showUploadZone ? (
             <UploadZone onFileUpload={handleFileUpload} />
           ) : (
             <div className={styles.editor}>
