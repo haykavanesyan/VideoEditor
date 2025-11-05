@@ -1,10 +1,8 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { Clock } from 'lucide-react';
 import { observer } from 'mobx-react-lite';
-
 import { videoStore } from '../../stores';
 import { formatTime } from '../../utils/formatTime';
-
 import styles from './Timeline.module.scss';
 
 interface TimelineProps {
@@ -16,43 +14,66 @@ const Timeline: React.FC<TimelineProps> = observer(({ videoRef }) => {
   const timelineRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState<'start' | 'end' | null>(null);
 
-  const handleMouseMove = (e: MouseEvent) => {
-    if (!isDragging) return;
+  const getTimeFromClientX = (clientX: number) => {
     const timeline = timelineRef.current;
-    if (!timeline) return;
-
+    if (!timeline) return 0;
     const rect = timeline.getBoundingClientRect();
-    const x = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
+    const x = Math.max(0, Math.min(clientX - rect.left, rect.width));
     const percentage = x / rect.width;
-    const time = percentage * store.duration;
+    return percentage * store.duration;
+  };
 
+  const updateTrim = (clientX: number) => {
+    if (!isDragging) return;
+    const time = getTimeFromClientX(clientX);
     if (isDragging === 'start') {
       store.setTrimStart(Math.min(time, store.trimEnd - 0.1));
-      const video = videoRef.current
+      const video = videoRef.current;
       if (video) {
-        video.currentTime = Math.min(time, store.trimEnd - 0.1)
+        video.currentTime = Math.min(time, store.trimEnd - 0.1);
       }
     } else if (isDragging === 'end') {
       store.setTrimEnd(Math.max(time, store.trimStart + 0.1));
     }
   };
 
-  const handleMouseUp = () => {
-    setIsDragging(null);
+  const handleMouseMove = (e: MouseEvent) => updateTrim(e.clientX);
+  const handleMouseUp = () => setIsDragging(null);
+
+  const handleTouchMove = (e: TouchEvent) => {
+    if (!isDragging) return;
+    const touch = e.touches[0];
+    if (touch) updateTrim(touch.clientX);
   };
+
+  const handleTouchEnd = () => setIsDragging(null);
 
   useEffect(() => {
     if (isDragging) {
       document.addEventListener('mousemove', handleMouseMove);
       document.addEventListener('mouseup', handleMouseUp);
+
+      document.addEventListener('touchmove', handleTouchMove);
+      document.addEventListener('touchend', handleTouchEnd);
+      document.addEventListener('touchcancel', handleTouchEnd);
+
       return () => {
         document.removeEventListener('mousemove', handleMouseMove);
         document.removeEventListener('mouseup', handleMouseUp);
+
+        document.removeEventListener('touchmove', handleTouchMove);
+        document.removeEventListener('touchend', handleTouchEnd);
+        document.removeEventListener('touchcancel', handleTouchEnd);
       };
     }
   }, [isDragging, store.duration, store.trimStart, store.trimEnd]);
 
   const handleMarkerMouseDown = (type: 'start' | 'end') => {
+    setIsDragging(type);
+  };
+
+  const handleMarkerTouchStart = (type: 'start' | 'end') => (e: React.TouchEvent) => {
+    e.stopPropagation();
     setIsDragging(type);
   };
 
@@ -98,6 +119,7 @@ const Timeline: React.FC<TimelineProps> = observer(({ videoRef }) => {
             e.stopPropagation();
             handleMarkerMouseDown('start');
           }}
+          onTouchStart={handleMarkerTouchStart('start')}
           style={{ left: `${(store.trimStart / store.duration) * 100}%` }}
         >
           <div className={styles.markerHandle} />
@@ -110,6 +132,7 @@ const Timeline: React.FC<TimelineProps> = observer(({ videoRef }) => {
             e.stopPropagation();
             handleMarkerMouseDown('end');
           }}
+          onTouchStart={handleMarkerTouchStart('end')}
           style={{ left: `${(store.trimEnd / store.duration) * 100}%` }}
         >
           <div className={styles.markerHandle} />
