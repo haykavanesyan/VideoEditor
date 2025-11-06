@@ -101,3 +101,84 @@
     background: white;
     border-radius: 2px;
   }
+
+  
+@media (max-width: 1024px) {
+  .timeline {
+    height: 70px;
+  }
+
+  .marker {
+    width: 22px;
+    height: 50px;
+  }
+
+  .markerHandle {
+    height: 28px;
+  }
+}
+
+@media (max-width: 768px) {
+  .timelineHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .trimText,
+  .currentTime {
+    font-size: 13px;
+  }
+
+  .durationBadge {
+    font-size: 11px;
+    padding: 3px 10px;
+  }
+
+  .timeline {
+    height: 60px;
+  }
+
+  .marker {
+    width: 20px;
+    height: 45px;
+  }
+
+  .markerHandle {
+    height: 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .timelineContainer {
+    margin-bottom: 20px;
+  }
+
+  .trimInfo {
+    gap: 4px;
+  }
+
+  .trimText,
+  .currentTime {
+    font-size: 12px;
+  }
+
+  .durationBadge {
+    font-size: 10px;
+    padding: 2px 8px;
+  }
+
+  .timeline {
+    height: 50px;
+    border-radius: 8px;
+  }
+
+  .marker {
+    width: 18px;
+    height: 40px;
+  }
+
+  .markerHandle {
+    height: 20px;
+  }
+}
