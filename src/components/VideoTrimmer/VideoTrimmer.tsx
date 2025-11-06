@@ -8,12 +8,15 @@ import VideoPlayer from '../VideoPlayer/VideoPlayer';
 import Controls from '../Controls/Controls';
 import Timeline from '../Timeline/Timeline';
 import { ffmpegService } from '../../services/ffmpegService';
+import { useVideoTimeline } from '../../hooks/useVideoTimeline';
 
 import styles from './VideoTrimmer.module.scss';
 
 const VideoTrimmer: React.FC = observer(() => {
   const store = videoStore;
   const videoRef = useRef<HTMLVideoElement>(null);
+
+  const { timelineRef, isDragging, onDragStart } = useVideoTimeline(videoRef);
 
   const handleFileUpload = (file: File) => {
     const url = URL.createObjectURL(file);
@@ -151,7 +154,7 @@ const VideoTrimmer: React.FC = observer(() => {
                 onResetTrim={resetTrim}
               />
 
-              <Timeline videoRef={videoRef} />
+              <Timeline timelineRef={timelineRef} isDragging={isDragging} onDragStart={onDragStart} />
 
               <button
                 onClick={exportVideo}

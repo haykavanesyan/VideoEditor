@@ -18,22 +18,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = observer(({
 }) => {
   const store = videoStore;
 
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    const handlePlay = () => store.update('isPlaying',true);
-    const handlePause = () => store.update('isPlaying',false);
-
-    video.addEventListener('play', handlePlay);
-    video.addEventListener('pause', handlePause);
-
-    return () => {
-      video.removeEventListener('play', handlePlay);
-      video.removeEventListener('pause', handlePause);
-    };
-  }, [videoRef, store]);
-
   return (
     <div className={styles.videoPlayer}>
       <video
