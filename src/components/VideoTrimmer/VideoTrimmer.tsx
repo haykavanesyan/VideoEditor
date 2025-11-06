@@ -8,6 +8,7 @@ import VideoPlayer from '../VideoPlayer/VideoPlayer';
 import Controls from '../Controls/Controls';
 import Timeline from '../Timeline/Timeline';
 import { ffmpegService } from '../../services/ffmpegService';
+import { errorService } from '../../services/errorService';
 import { useVideoTimeline } from '../../hooks/useVideoTimeline';
 
 import styles from './VideoTrimmer.module.scss';
@@ -18,13 +19,19 @@ const VideoTrimmer: React.FC = observer(() => {
 
   const { timelineRef, isDragging, onDragStart } = useVideoTimeline(videoRef);
 
+  const getVideo = () => {
+    const video = videoRef.current;
+    if (!video) throw new Error('Video element is not available');
+    return video;
+  };
+
   const handleFileUpload = (file: File) => {
     const url = URL.createObjectURL(file);
     store.uploadFile(file, url)
   };
 
   const handleLoadedMetadata = () => {
-    const video = videoRef.current;
+    const video = getVideo();
     if (video) {
       store.update('duration', video.duration);
       store.update('trimEnd', video.duration);
@@ -32,7 +39,7 @@ const VideoTrimmer: React.FC = observer(() => {
   };
 
   const handleTimeUpdate = () => {
-    const video = videoRef.current;
+    const video = getVideo();
     if (video) {
       store.update('currentTime', video.currentTime);
       if (video.currentTime >= store.trimEnd) {
@@ -42,7 +49,7 @@ const VideoTrimmer: React.FC = observer(() => {
   };
 
   const togglePlayPause = () => {
-    const video = videoRef.current;
+    const video = getVideo();
     if (video) {
       if (store.isPlaying) {
         video.pause();
@@ -58,7 +65,7 @@ const VideoTrimmer: React.FC = observer(() => {
   };
 
   const changeSpeed = (speed: number) => {
-    const video = videoRef.current;
+    const video = getVideo();
     if (video) {
       video.playbackRate = speed;
       store.update('playbackSpeed', speed);
@@ -67,7 +74,7 @@ const VideoTrimmer: React.FC = observer(() => {
 
   const resetTrim = () => {
     store.resetTrim()
-    const video = videoRef.current;
+    const video = getVideo();
     if (video) {
       video.currentTime = 0;
       video.playbackRate = 1
@@ -101,9 +108,10 @@ const VideoTrimmer: React.FC = observer(() => {
       link.download = `trimmed_${store.videoFile.name}`;
       link.click();
       URL.revokeObjectURL(url);
+      errorService.handle('err', 'Failed to initialize FFmpeg');
+
     } catch (err) {
-      console.error('Export failed:', err);
-      alert('Failed to export video');
+      errorService.handle(err, 'Failed to initialize FFmpeg');
     } finally {
       store.update('isExporting', false);
     }
