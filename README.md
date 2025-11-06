@@ -1,50 +1,83 @@
-# Video Trimmer 🎬✂️
+# Video Trimmer
 
-A modern, responsive web application for trimming videos directly in your browser. Built with React and featuring a beautiful gradient UI, this tool allows you to precisely trim video clips with an intuitive timeline interface.
+**Video Trimmer** — это веб-приложение для обрезки видео в браузере. Пользователь может загружать видео, выбирать сегменты для трима, управлять скоростью воспроизведения и экспортировать результат в формате MP4 с помощью FFmpeg прямо на клиенте.
 
-## Features ✨
+---
 
-- **🎥 Video Upload**: Drag & drop or click to upload MP4, MOV, and WEBM files
-- **⏱️ Precise Trimming**: Visual timeline with draggable start/end markers
-- **🎮 Playback Controls**: Play/pause within trimmed range
-- **⚡ Speed Control**: Multiple playback speeds (0.5x, 1x, 1.5x, 2x)
-- **📊 Real-time Preview**: Live timeline with current position indicator
-- **💾 Export Functionality**: Download trimmed videos
-- **🎨 Beautiful UI**: Modern gradient design with smooth animations
-- **📱 Responsive Design**: Works on desktop and mobile devices
+## 🏗 Архитектура
 
-## Quick Start 🚀
+Приложение построено на **React + TypeScript** с использованием **MobX** для управления состоянием.
 
-### Installation
+### Основные слои:
 
-1. **Clone or download the project files**
+1. **Компоненты UI**
+   - `VideoTrimmer` — главный компонент редактора.
+   - `UploadZone` — зона для загрузки видео с поддержкой drag & drop.
+   - `VideoPlayer` — обертка для HTML5 `<video>` с событиями `timeupdate` и `loadedmetadata`.
+   - `Controls` — кнопки управления воспроизведением, скоростью и сбросом трима.
+   - `Timeline` — визуализация трима с маркерами начала и конца, отображением текущего времени и длительности.
 
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
+2. **Хуки**
+   - `useVideoTimeline` — управление drag & drop маркеров таймлайна.
+     - Пересчет позиции курсора в время трима.
+     - Подписка на события `mousemove`, `mouseup`, `touchmove`, `touchend`, `touchcancel`.
+     - Обновление `trimStart` и `trimEnd` в store.
+   - Обеспечивает синхронизацию текущего времени видео с маркерами.
 
-3. **Start the development server**
-   ```bash
-   npm run dev
-   ```
+3. **MobX Store (`videoStore`)**
+   - Состояние видео: файл, URL, длительность, текущий таймкод, трим-диапазон, скорость и экспорт.
+   - Методы:
+     - `uploadFile(file, url)` — загрузка видео и отображение плеера.
+     - `resetTrim()` — сброс трим-диапазона и скорости.
+     - `resetUpload()` — сброс видеофайла и возврат к зоне загрузки.
+   - Вычисляемое свойство `trimDuration` возвращает длительность выбранного сегмента.
 
-4. **Open your browser**
-   Navigate to `http://localhost:5173/`
+4. **Сервисы**
+   - `ffmpegService` — обертка над `@ffmpeg/ffmpeg` для трима и экспорта видео.
+     - `load()` — загрузка и инициализация FFmpeg.
+     - `trimAndExport(file, start, end, speed)` — обрезка и изменение скорости видео.
+   - `errorService` — централизованная обработка ошибок через `react-toastify`.
 
-## Usage Guide 📖
+---
 
-### Basic Trimming
+## 🔧 Поток данных
 
-1. **Upload Video**: Click the upload zone or drag & drop a video file
-2. **Set Trim Points**:
-   - Drag the blue start marker to set the beginning
-   - Drag the purple end marker to set the end
-3. **Preview**: Use play/pause to review your selection
-4. **Export**: Click "Export Trimmed Video" to download
+1. Пользователь загружает видео через `UploadZone`.
+2. Видео отображается в `VideoPlayer`. Метаданные (длительность) сохраняются в `videoStore`.
+3. `Timeline` отображает маркеры на основе `trimStart`, `trimEnd` и `currentTime`.
+4. Перемещение маркеров через `useVideoTimeline` обновляет store.
+5. Управление воспроизведением и скоростью через `Controls`.
+6. Экспорт видео через `ffmpegService` с учетом текущего диапазона и скорости.
 
-### Advanced Features
+---
 
-- **Playback Speed**: Change speed using the 0.5x, 1x, 1.5x, 2x buttons
-- **Reset**: Click "Reset" to clear trim markers and return to start
-- **Auto-loop**: Video automatically loops within trimmed range during playback
+## 🖥 Структура проекта
+
+```bash
+src/
+├─ components/
+│ ├─ VideoTrimmer/ # Главный редактор
+│ ├─ UploadZone/ # Загрузка видео
+│ ├─ VideoPlayer/ # Плеер
+│ ├─ Controls/ # Управление видео
+│ └─ Timeline/ # Таймлайн с маркерами
+├─ hooks/
+│ └─ useVideoTimeline.ts # Drag & drop маркеров
+├─ stores/
+│ └─ videoStore.ts # MobX store
+├─ services/
+│ ├─ ffmpegService.ts # FFmpeg обертка
+│ └─ errorService.ts # Централизованная обработка ошибок
+├─ utils/
+│ └─ formatTime.ts # Форматирование времени
+└─ App.tsx
+```
+
+## 📦 Установка и запуск
+
+```bash
+git clone
+cd VideoEditor
+npm install
+npm run dev
+```
