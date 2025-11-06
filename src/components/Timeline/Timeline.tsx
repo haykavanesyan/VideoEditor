@@ -27,13 +27,13 @@ const Timeline: React.FC<TimelineProps> = observer(({ videoRef }) => {
     if (!isDragging) return;
     const time = getTimeFromClientX(clientX);
     if (isDragging === 'start') {
-      store.setTrimStart(Math.min(time, store.trimEnd - 0.1));
+      store.update('trimStart', Math.min(time, store.trimEnd - 0.1));
       const video = videoRef.current;
       if (video) {
         video.currentTime = Math.min(time, store.trimEnd - 0.1);
       }
     } else if (isDragging === 'end') {
-      store.setTrimEnd(Math.max(time, store.trimStart + 0.1));
+      store.update('trimEnd', Math.max(time, store.trimStart + 0.1));
     }
   };
 

@@ -16,62 +16,26 @@ class VideoStore {
     makeAutoObservable(this);
   }
 
-  setVideoFile(file: File | null) {
-    this.videoFile = file;
+  update<K extends keyof VideoStore>(key: K, value: VideoStore[K]) {
+    (this[key] as VideoStore[K]) = value;
   }
 
-  setVideoUrl(url: string) {
-    this.videoUrl = url;
-  }
-
-  setDuration(duration: number) {
-    this.duration = duration;
-  }
-
-  setCurrentTime(currentTime: number) {
-    this.currentTime = currentTime;
-  }
-
-  setTrimStart(trimStart: number) {
-    this.trimStart = trimStart;
-  }
-
-  setTrimEnd(trimEnd: number) {
-    this.trimEnd = trimEnd;
-  }
-
-  setIsPlaying(isPlaying: boolean) {
-    this.isPlaying = isPlaying;
-  }
-
-  setPlaybackSpeed(playbackSpeed: number) {
-    this.playbackSpeed = playbackSpeed;
-  }
-
-  setIsExporting(isExporting: boolean) {
-    this.isExporting = isExporting;
-  }
-
-  setShowUploadZone(show: boolean) {
-    this.showUploadZone = show;
+  uploadFile(file: File, url: string) {
+    this.videoFile = file
+    this.videoUrl = url
+    this.showUploadZone = false
   }
 
   resetTrim() {
-    this.trimStart = 0;
-    this.trimEnd = this.duration;
+    this.trimStart = 0
+    this.trimEnd = this.duration
+    this.playbackSpeed = 1
   }
 
-  reset() {
-    this.videoFile = null;
-    this.videoUrl = '';
-    this.duration = 0;
-    this.currentTime = 0;
-    this.trimStart = 0;
-    this.trimEnd = 0;
-    this.isPlaying = false;
-    this.playbackSpeed = 1;
-    this.isExporting = false;
-    this.showUploadZone = true;
+  resetUpload() {
+    this.videoFile = null
+    this.videoUrl = ''
+    this.showUploadZone = true
   }
 
   get trimDuration() {

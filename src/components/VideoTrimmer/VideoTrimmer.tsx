@@ -17,23 +17,21 @@ const VideoTrimmer: React.FC = observer(() => {
 
   const handleFileUpload = (file: File) => {
     const url = URL.createObjectURL(file);
-    store.setVideoFile(file);
-    store.setVideoUrl(url);
-    store.setShowUploadZone(false);
+    store.uploadFile(file, url)
   };
 
   const handleLoadedMetadata = () => {
     const video = videoRef.current;
     if (video) {
-      store.setDuration(video.duration);
-      store.setTrimEnd(video.duration);
+      store.update('duration', video.duration);
+      store.update('trimEnd', video.duration);
     }
   };
 
   const handleTimeUpdate = () => {
     const video = videoRef.current;
     if (video) {
-      store.setCurrentTime(video.currentTime);
+      store.update('currentTime', video.currentTime);
       if (video.currentTime >= store.trimEnd) {
         video.currentTime = store.trimStart;
       }
@@ -45,13 +43,13 @@ const VideoTrimmer: React.FC = observer(() => {
     if (video) {
       if (store.isPlaying) {
         video.pause();
-        store.setIsPlaying(false);
+        store.update('isPlaying', false);
       } else {
         if (video.currentTime >= store.trimEnd || video.currentTime < store.trimStart) {
           video.currentTime = store.trimStart;
         }
         video.play().catch(console.error);
-        store.setIsPlaying(true);
+        store.update('isPlaying', true);
       }
     }
   };
@@ -60,14 +58,12 @@ const VideoTrimmer: React.FC = observer(() => {
     const video = videoRef.current;
     if (video) {
       video.playbackRate = speed;
-      store.setPlaybackSpeed(speed);
+      store.update('playbackSpeed', speed);
     }
   };
 
   const resetTrim = () => {
-    store.setTrimStart(0);
-    store.setTrimEnd(store.duration);
-    store.setPlaybackSpeed(1)
+    store.resetTrim()
     const video = videoRef.current;
     if (video) {
       video.currentTime = 0;
@@ -77,16 +73,14 @@ const VideoTrimmer: React.FC = observer(() => {
   };
 
   const handleFileReset = () => {
-    store.setVideoFile(null);
-    store.setVideoUrl('');
-    store.setShowUploadZone(true);
+    store.resetUpload()
     resetTrim()
   };
 
   const exportVideo = async () => {
     if (!store.videoFile) return;
 
-    store.setIsExporting(true);
+    store.update('isExporting', true);
     try {
       await ffmpegService.load();
 
@@ -108,7 +102,7 @@ const VideoTrimmer: React.FC = observer(() => {
       console.error('Export failed:', err);
       alert('Failed to export video');
     } finally {
-      store.setIsExporting(false);
+      store.update('isExporting', false);
     }
   };
 
