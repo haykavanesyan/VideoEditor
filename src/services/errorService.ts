@@ -1,11 +1,10 @@
 import { toast } from 'react-toastify';
 
 export const errorService = {
-    handle(error: unknown, message?: string) {
-        console.error(error);
+    handle(type: 'error' | 'warning', error: unknown, message?: string) {
         const text =
             message ||
             (error instanceof Error ? error.message : 'Unexpected error occurred');
-        toast.error(text);
+        toast[type](text);
     },
 };
