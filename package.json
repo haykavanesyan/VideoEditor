@@ -9,9 +9,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@ffmpeg/core": "^0.12.10",
-    "@ffmpeg/ffmpeg": "^0.12.15",
-    "@ffmpeg/util": "^0.12.2",
+    "@ffmpeg/ffmpeg": "0.11.6",
+    "@ffmpeg/core": "0.11.0",
     "lucide-react": "^0.552.0",
     "mobx": "^6.13.0",
     "mobx-react-lite": "^4.0.5",
