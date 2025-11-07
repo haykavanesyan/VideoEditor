@@ -1,8 +1,10 @@
 import React, { LegacyRef } from 'react';
 import { Clock } from 'lucide-react';
 import { observer } from 'mobx-react-lite';
+
 import { videoStore } from '../../stores';
 import { formatTime } from '../../utils/formatTime';
+
 import styles from './Timeline.module.scss';
 
 interface TimelineProps {
@@ -13,6 +15,18 @@ interface TimelineProps {
 
 const Timeline: React.FC<TimelineProps> = observer(({ timelineRef, isDragging, onDragStart }) => {
   const store = videoStore
+
+  const getPercentage = (value: number): number => {
+    if (!store.duration || store.duration <= 0 || !isFinite(store.duration)) return 0;
+    const percentage = (value / store.duration) * 100;
+    return Math.max(0, Math.min(100, percentage));
+  };
+
+  const selectedRangeLeft = getPercentage(store.trimStart);
+  const selectedRangeWidth = getPercentage(store.trimEnd - store.trimStart);
+  const currentTimePosition = getPercentage(store.currentTime);
+  const startMarkerPosition = getPercentage(store.trimStart);
+  const endMarkerPosition = getPercentage(store.trimEnd);
 
   const handleMarkerMouseDown = (type: 'start' | 'end') => {
     onDragStart(type);
@@ -48,14 +62,14 @@ const Timeline: React.FC<TimelineProps> = observer(({ timelineRef, isDragging, o
         <div
           className={styles.selectedRange}
           style={{
-            left: `${(store.trimStart / store.duration) * 100}%`,
-            width: `${((store.trimEnd - store.trimStart) / store.duration) * 100}%`,
+            left: `${selectedRangeLeft}%`,
+            width: `${selectedRangeWidth}%`,
           }}
         />
 
         <div
           className={styles.currentTimeIndicator}
-          style={{ left: `${(store.currentTime / store.duration) * 100}%` }}
+          style={{ left: `${currentTimePosition}%` }}
         />
 
         <div
@@ -66,7 +80,7 @@ const Timeline: React.FC<TimelineProps> = observer(({ timelineRef, isDragging, o
             handleMarkerMouseDown('start');
           }}
           onTouchStart={handleMarkerTouchStart('start')}
-          style={{ left: `${(store.trimStart / store.duration) * 100}%` }}
+          style={{ left: `${startMarkerPosition}%` }}
         >
           <div className={styles.markerHandle} />
         </div>
@@ -79,7 +93,7 @@ const Timeline: React.FC<TimelineProps> = observer(({ timelineRef, isDragging, o
             handleMarkerMouseDown('end');
           }}
           onTouchStart={handleMarkerTouchStart('end')}
-          style={{ left: `${(store.trimEnd / store.duration) * 100}%` }}
+          style={{ left: `${endMarkerPosition}%` }}
         >
           <div className={styles.markerHandle} />
         </div>
