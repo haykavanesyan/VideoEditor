@@ -1,0 +1,43 @@
+.progressContainer {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 12px 0;
+}
+
+.progressBar {
+    flex: 1;
+    height: 8px;
+    background: #ddd;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.progressFill {
+    height: 100%;
+    background: #4caf50;
+    transition: width 0.2s ease;
+}
+
+.cancelButton {
+    background: #ff4d4d;
+    border: none;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.cancelButton:hover {
+    background: #e64545;
+}
+
+.progressText {
+    font-size: 14px;
+    font-weight: 600;
+    color: #4a5568;
+    min-width: 40px;
+}
